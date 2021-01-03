@@ -11,6 +11,7 @@ const octokit = github.getOctokit(token);
 async function main() {
   const issuesAry = issues.split(',');
   var movedIssues = [];
+  console.log(issuesAry);
 
   // Get all cards in the FROM column
   var projectCards = [];
@@ -34,6 +35,7 @@ async function main() {
 
   // Check each card in the FROM column to see if it's in the list of issues
   // that we want to move.
+  console.log(projectCards);
   for (var i = 0; i < projectCards.length; i++) {
     const card = projectCards[i];
 
@@ -44,6 +46,7 @@ async function main() {
       return true;
     }
     const issueNumber = matches[1];
+    console.log(`issueNumber=${issueNumber}`);
 
     // Check if it's in the list of issues
     for (var j = 0; j < issuesAry.length; j++) {
