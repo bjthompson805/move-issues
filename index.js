@@ -15,14 +15,14 @@ async function main() {
   // Get all cards in the FROM column
   var projectCards = [];
   var done = false;
-  for (var page = 1; !done; page++) {
+  for (var page = 0; !done; page++) {
     // Get all cards on the page
     const cards = octokit.projects.listCards({
       column_id: fromColumn,
       per_page: 100,
       page: page
     });
-    for (var i = 0; i < cards.data.length; i++) {
+    for (var i = 0; cards.data && i < cards.data.length; i++) {
       const card = cards.data[i];
       projectCards.push(card);
     }
