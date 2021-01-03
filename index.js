@@ -27,7 +27,7 @@ async function main() {
       projectCards.push(card);
     }
 
-    if (cards.data.length < 100) {
+    if (!cards.data || cards.data.length < 100) {
       done = true;
     }
   }
