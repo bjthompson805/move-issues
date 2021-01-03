@@ -1,15 +1,68 @@
 const core = require('@actions/core');
 const github = require('@actions/github');
+const token = core.getInput('token');
+const issues = core.getInput('issues');
+const fromColumn = core.getInput('from_column');
+const toColumn = core.getInput('to_column');
+const repoOwner = github.context.repo.owner;
+const repo = github.context.repo.repo;
+const octokit = github.getOctokit(token);
 
-try {
-  // `who-to-greet` input defined in action metadata file
-  const nameToGreet = core.getInput('who-to-greet');
-  console.log(`Hello ${nameToGreet}!`);
-  const time = (new Date()).toTimeString();
-  core.setOutput("time", time);
-  // Get the JSON webhook payload for the event that triggered the workflow
-  const payload = JSON.stringify(github.context.payload, undefined, 2)
-  console.log(`The event payload: ${payload}`);
-} catch (error) {
-  core.setFailed(error.message);
+async function main() {
+  const issuesAry = issues.split(',');
+  var movedIssues = [];
+
+  // Get all cards in the FROM column
+  var projectCards = [];
+  var done = false;
+  for (var page = 1; !done; page++) {
+    // Get all cards on the page
+    const cards = octokit.projects.listCards({
+      column_id: fromColumn,
+      per_page: 100,
+      page: page
+    });
+    for (var i = 0; i < cards.data.length; i++) {
+      const card = cards.data[i];
+      projectCards.push(card);
+    }
+
+    if (cards.data.length < 100) {
+      done = true;
+    }
+  }
+
+  // Check each card in the FROM column to see if it's in the list of issues
+  // that we want to move.
+  for (var i = 0; i < projectCards.length; i++) {
+    const card = projectCards[i];
+
+    // Get the issue number
+    const matches = card.content_url.match(/\/issues\/(\d+)/);
+    if (!matches) {
+      console.log(`Couldn't match regexp to '${card.content_url}'.`);
+      return true;
+    }
+    const issueNumber = matches[1];
+
+    // Check if it's in the list of issues
+    for (var j = 0; j < issuesAry.length; j++) {
+      const issue = issuesAry[j];
+      if (issue === issueNumber) {
+        ////////////////////
+        // Move the issue //
+        ////////////////////
+        await octokit.projects.moveCard({
+          card_id: card.id,
+          position: 0,
+          column_id: toColumn
+        });
+        movedIssues.push(issueNumber);
+      }
+    }
+  }
+
+  core.setOutput('moved_issues', movedIssues.join(','));
 }
+
+main();

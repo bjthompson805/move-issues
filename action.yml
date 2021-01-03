@@ -1,13 +1,25 @@
 name: 'Hello World'
 description: 'Greet someone and record the time'
 inputs:
-  who-to-greet:  # id of input
-    description: 'Who to greet'
+  token:
+    description: 'github token'
     required: true
-    default: 'World'
+    default: ''
+  issues:
+    description: 'Issues to move'
+    required: true
+    default: ''
+  from_column:
+    description: 'Column to move issues from'
+    required: true
+    default: ''
+  to_column:
+    description: 'Column to move issues to'
+    required: true
+    default: ''
 outputs:
-  time: # id of output
-    description: 'The time we greeted you'
+  moved_issues:
+    description: 'Comma-delimited list of issues that were moved'
 runs:
   using: 'node12'
   main: 'index.js'
