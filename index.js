@@ -18,11 +18,12 @@ async function main() {
   var done = false;
   for (var page = 0; !done; page++) {
     // Get all cards on the page
-    const cards = octokit.projects.listCards({
+    const cards = await octokit.projects.listCards({
       column_id: fromColumn,
       per_page: 100,
       page: page
     });
+    console.log(cards);
     for (var i = 0; cards.data && i < cards.data.length; i++) {
       const card = cards.data[i];
       projectCards.push(card);
