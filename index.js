@@ -58,7 +58,7 @@ async function main() {
         ////////////////////
         await octokit.projects.moveCard({
           card_id: card.id,
-          position: 'position',
+          position: 'top',
           column_id: parseInt(toColumn)
         });
         movedIssues.push(issueNumber);
